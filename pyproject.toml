@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "word-error-rate-cli"
+version = "0.1.0"
+description = "Calculate a word error rate (WER) from provided sets of correct and actual transcripts."
+authors = ["camball <67163069+camball@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{ include = "wer" }]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+jiwer = "^3.0.3"
+prettytable = "^3.10.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+wer = "wer.cli:main"

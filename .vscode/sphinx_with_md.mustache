@@ -1,0 +1,39 @@
+{{! Cameron's Sphinx + Markdown Docstring Template }}
+{{! Used in conjunction with VS Code extension `autoDocstring` }}
+{{! https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring }}
+{{summaryPlaceholder}}
+
+{{extendedSummaryPlaceholder}}
+
+{{#parametersExist}}
+### Parameters
+{{/parametersExist}}
+{{#args}}
+- :param `{{typePlaceholder}}` `{{var}}`: {{descriptionPlaceholder}}
+{{/args}}
+{{#kwargs}}
+- :param `{{typePlaceholder}}` `{{var}}`: {{descriptionPlaceholder}}, defaults to `{{&default}}`
+{{/kwargs}}
+
+{{#exceptionsExist}}
+### Raises
+{{/exceptionsExist}}
+{{#exceptions}}
+:raises `{{type}}`: {{descriptionPlaceholder}}
+{{/exceptions}}
+
+{{#returnsExist}}
+### Returns
+{{/returnsExist}}
+{{#returns}}
+:return: {{descriptionPlaceholder}}
+:rtype: `{{typePlaceholder}}`
+{{/returns}}
+
+{{#yieldsExist}}
+### Yields
+{{/yieldsExist}}
+{{#yields}}
+:yield: {{descriptionPlaceholder}}
+:rtype: `{{typePlaceholder}}`
+{{/yields}}
