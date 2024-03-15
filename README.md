@@ -1,5 +1,24 @@
 # Word Error Rate Calculator
 
+Calculate the word error rate (WER) from provided correct and actual text file(s).
+
+```sh
+$ wer --expected Expected --actual Actual  # usage comparing folders of corresponding files
+
++-----------------+-----------------------+---------+-----------+
+|     Filename    | Word Error Rate (WER) | % Error | % Success |
++-----------------+-----------------------+---------+-----------+
+| test_data_1.txt |   0.3157894736842105  |  31.58% |   68.42%  |
+| test_data_2.txt |   0.3684210526315789  |  36.84% |   63.16%  |
++-----------------+-----------------------+---------+-----------+
+
+$ wer --expected expected.txt --actual actual.txt  # usage comparing single files
+
+Word Error Rate (WER):  0.3157894736842105
+Percent Error:  31.58%
+Percent Success:  68.42%
+```
+
 ## Installation
 
 ```sh
@@ -9,26 +28,7 @@ pip3 install .
 wer --expected Expected --actual Actual
 ```
 
-## Usage
-
-### Basic
-
-```sh
-$ wer --expected Expected --actual Actual  # usage with folders
-
-+-----------------+-----------------------+---------+-----------+
-|     Filename    | Word Error Rate (WER) | % Error | % Success |
-+-----------------+-----------------------+---------+-----------+
-| test_data_1.txt |   0.3157894736842105  |  31.58% |   68.42%  |
-| test_data_2.txt |   0.3684210526315789  |  36.84% |   63.16%  |
-+-----------------+-----------------------+---------+-----------+
-
-$ wer --expected expected.txt --actual actual.txt  # usage with single files
-
-Word Error Rate (WER):  0.3157894736842105
-Percent Error:  31.58%
-Percent Success:  68.42%
-```
+## Options
 
 ### `--ignore`/`-i`
 

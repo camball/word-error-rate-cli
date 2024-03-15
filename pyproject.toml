@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "word-error-rate-cli"
 version = "0.1.0"
-description = "Calculate a word error rate (WER) from provided sets of correct and actual transcripts."
+description = "Calculate the word error rate (WER) from provided correct and actual text file(s)."
 authors = ["camball <67163069+camball@users.noreply.github.com>"]
 readme = "README.md"
 packages = [{ include = "wer" }]

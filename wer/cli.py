@@ -8,7 +8,7 @@ import sys
 def get_args(args: list[str]):
     parser = argparse.ArgumentParser(
         prog="wer",
-        description="Calculate a word error rate (WER) from provided sets of correct and actual transcripts.",
+        description="Calculate the word error rate (WER) from provided correct and actual text file(s).",
     )
 
     parser.add_argument(
