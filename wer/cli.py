@@ -110,8 +110,8 @@ def main():
         )
         print()
         print(f"Word Error Rate (WER):  {word_error_rate}")
-        print(f"Percent Error:  {word_error_rate:.2%}")
-        print(f"Percent Success:  {1-word_error_rate:.2%}")
+        print(f"Percent Error:          {word_error_rate:.2%}")
+        print(f"Percent Success:        {1-word_error_rate:.2%}")
         print()
 
     elif expected_path.is_dir() and actual_path.is_dir():

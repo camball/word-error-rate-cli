@@ -15,8 +15,8 @@ $ wer --expected Expected --actual Actual  # usage comparing folders of correspo
 $ wer --expected expected.txt --actual actual.txt  # usage comparing single files
 
 Word Error Rate (WER):  0.3157894736842105
-Percent Error:  31.58%
-Percent Success:  68.42%
+Percent Error:          31.58%
+Percent Success:        68.42%
 ```
 
 ## Installation
