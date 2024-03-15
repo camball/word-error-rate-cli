@@ -115,3 +115,5 @@ On a technical level, it removes the [`jiwer.ReduceToSingleSentence`](https://ji
     ├── transcript_1.txt
     └── transcript_2.txt
     ```
+
+    This is necessary so that the program knows which corresponding files to compare with when calculating WERs.
