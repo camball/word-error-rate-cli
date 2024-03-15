@@ -11,8 +11,10 @@ wer --expected Expected --actual Actual
 
 ## Usage
 
+### Basic
+
 ```sh
-$ wer --expected Expected --actual Actual
+$ wer --expected Expected --actual Actual  # usage with folders
 
 +-----------------+-----------------------+---------+-----------+
 |     Filename    | Word Error Rate (WER) | % Error | % Success |
@@ -21,20 +23,57 @@ $ wer --expected Expected --actual Actual
 | test_data_2.txt |   0.3684210526315789  |  36.84% |   63.16%  |
 +-----------------+-----------------------+---------+-----------+
 
-$ wer --expected expected.txt --actual actual.txt
+$ wer --expected expected.txt --actual actual.txt  # usage with single files
 
 Word Error Rate (WER):  0.3157894736842105
 Percent Error:  31.58%
 Percent Success:  68.42%
 ```
 
+### `--ignore`/`-i`
+
+The following demonstrates example usage of the `-i`/`--ignore` option. For example, if you are trying to calculate the WER on speech-to-text transcriptions, where each line begins with "Agent:" and "Customer:", denoting who is speaking in a conversation, that is metadata about the conversation (i.e., not the actual text we want to calculate on) and should be ignored when processing the WER.
+
+```txt
+Agent: Good evening!
+Customer: Hi, good evening.
+```
+
+To handle this, the program allows you to pass a custom regex matcher, where any matches will be ignored. In the below example, the first run shows the processing on the raw text files. You can see that the success rate is higher than the second run, as the "Agent:"/"Customer:" text at the start of each line is artificially inflating it. On the second run, we apply the regex `^(?:Agent|Customer):` which properly ignores the file metadata, giving us the correct WER.
+
+```sh
+$ wer -e Expected -a Actual
+
++-----------------+-----------------------+---------+-----------+
+|     Filename    | Word Error Rate (WER) | % Error | % Success |
++-----------------+-----------------------+---------+-----------+
+| test_data_1.txt |   0.2727272727272727  |  27.27% |   72.73%  |
+| test_data_2.txt |   0.3181818181818182  |  31.82% |   68.18%  |
++-----------------+-----------------------+---------+-----------+
+
+$ wer -e Expected -a Actual -i "^(?:Agent|Customer):"
+
++-----------------+-----------------------+---------+-----------+
+|     Filename    | Word Error Rate (WER) | % Error | % Success |
++-----------------+-----------------------+---------+-----------+
+| test_data_1.txt |   0.3157894736842105  |  31.58% |   68.42%  |
+| test_data_2.txt |   0.3684210526315789  |  36.84% |   63.16%  |
++-----------------+-----------------------+---------+-----------+
+```
+
+### `--enforce-file-length-check`/`-c`
+
+When specified, enforces the rule that files being compared must have the same number of lines. Helpful for situations where you need to ensure your expected text file(s) have the same number of lines as your actual text file(s).
+
+If specified and files are of different lengths, the program will raise an error like the following:
+
+```txt
+ValueError: After applying the transforms on the reference and hypothesis sentences, their lengths must match. Instead got 13 reference and 15 hypothesis sentences.
+```
+
+On a technical level, it removes the [`jiwer.ReduceToSingleSentence`](https://jitsi.github.io/jiwer/reference/transforms/#transforms.ReduceToSingleSentence) text transform that is applied by default.
+
 ## Gotchas
-
-- Any two files being compared have to have the same number of sentences (lines), as this is a requirement for calculating the WER. For example, one file can't be 13 lines long and the other 15; they both have to be either 13 or 15 in that case. You will get an error if this condition is not met, that looks like
-
-    ```txt
-    ValueError: After applying the transforms on the reference and hypothesis sentences, their lengths must match. Instead got 13 reference and 15 hypothesis sentences.
-    ```
 
 - When folders are provided to the `--expected` and `--actual` arguments, each folder must contain exactly the same file content. For example, if the program is run as:
 
