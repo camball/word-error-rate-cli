@@ -6,10 +6,14 @@ Calculate the word error rate (WER) from provided correct and actual text file(s
 $ wer --expected Expected --actual Actual  # usage comparing folders of corresponding files
 
 +-----------------+-----------------------+---------+-----------+
-|     Filename    | Word Error Rate (WER) | % Error | % Success |
+|        Filename | Word Error Rate (WER) | % Error | % Success |
 +-----------------+-----------------------+---------+-----------+
-| test_data_1.txt |   0.3157894736842105  |  31.58% |   68.42%  |
-| test_data_2.txt |   0.3684210526315789  |  36.84% |   63.16%  |
+| test_data_1.txt | 0.3157894736842105    |  31.58% |    68.42% |
+| test_data_2.txt | 0.3684210526315789    |  36.84% |    63.16% |
+| test_data_3.txt | 0.14285714285714285   |  14.29% |    85.71% |
++-----------------+-----------------------+---------+-----------+
+|           Mean: | 0.2756892230576441    |  27.57% |    72.43% |
+|         Median: | 0.3157894736842105    |  31.58% |    68.42% |
 +-----------------+-----------------------+---------+-----------+
 
 $ wer --expected expected.txt --actual actual.txt  # usage comparing single files
@@ -22,9 +26,16 @@ Percent Success:        68.42%
 ## Installation
 
 ```sh
+# clone on your machine
 git clone https://github.com/camball/word-error-rate-cli
+
+# enter the install directory
 cd word-error-rate-cli/
+
+# install
 pip3 install .
+
+# use the program
 wer --expected Expected --actual Actual
 ```
 
@@ -45,19 +56,27 @@ To handle this, the program allows you to pass a custom regex matcher, where any
 $ wer -e Expected -a Actual
 
 +-----------------+-----------------------+---------+-----------+
-|     Filename    | Word Error Rate (WER) | % Error | % Success |
+|        Filename | Word Error Rate (WER) | % Error | % Success |
 +-----------------+-----------------------+---------+-----------+
-| test_data_1.txt |   0.2727272727272727  |  27.27% |   72.73%  |
-| test_data_2.txt |   0.3181818181818182  |  31.82% |   68.18%  |
+| test_data_1.txt | 0.2727272727272727    |  27.27% |    72.73% |
+| test_data_2.txt | 0.3181818181818182    |  31.82% |    68.18% |
+| test_data_3.txt | 0.125                 |  12.50% |    87.50% |
++-----------------+-----------------------+---------+-----------+
+|           Mean: | 0.23863636363636362   |  23.86% |    76.14% |
+|         Median: | 0.2727272727272727    |  27.27% |    72.73% |
 +-----------------+-----------------------+---------+-----------+
 
 $ wer -e Expected -a Actual -i "^(?:Agent|Customer):"
 
 +-----------------+-----------------------+---------+-----------+
-|     Filename    | Word Error Rate (WER) | % Error | % Success |
+|        Filename | Word Error Rate (WER) | % Error | % Success |
 +-----------------+-----------------------+---------+-----------+
-| test_data_1.txt |   0.3157894736842105  |  31.58% |   68.42%  |
-| test_data_2.txt |   0.3684210526315789  |  36.84% |   63.16%  |
+| test_data_1.txt | 0.3157894736842105    |  31.58% |    68.42% |
+| test_data_2.txt | 0.3684210526315789    |  36.84% |    63.16% |
+| test_data_3.txt | 0.14285714285714285   |  14.29% |    85.71% |
++-----------------+-----------------------+---------+-----------+
+|           Mean: | 0.2756892230576441    |  27.57% |    72.43% |
+|         Median: | 0.3157894736842105    |  31.58% |    68.42% |
 +-----------------+-----------------------+---------+-----------+
 ```
 

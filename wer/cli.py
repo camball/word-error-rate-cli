@@ -2,6 +2,7 @@ import argparse
 from jiwer import wer as _real_wer, transforms as tr
 from pathlib import Path
 from prettytable import PrettyTable
+from statistics import mean, median
 import sys
 
 
@@ -85,7 +86,7 @@ def wer(
     actual_path: Path,
     enforce_file_length_check: bool,
     regex_to_ignore: str,
-):
+) -> float:
     return _real_wer(
         reference=lines_from_file(expected_path),
         hypothesis=lines_from_file(actual_path),
@@ -135,27 +136,36 @@ def main():
             )
         }
 
-        table = PrettyTable()
-        table.field_names = [
-            "Filename",
-            "Word Error Rate (WER)",
-            r"% Error",
-            r"% Success",
-        ]
+        columns = {
+            "Filename": "r",
+            "Word Error Rate (WER)": "l",
+            r"% Error": "r",
+            r"% Success": "r",
+        }
+        table = PrettyTable(columns.keys())
+        for filename, alignment in columns.items():
+            table.align[filename] = alignment
 
-        for filename, word_error_rate in word_error_rates.items():
+        for idx, (filename, word_error_rate) in enumerate(word_error_rates.items()):
             table.add_row(
                 [
                     filename,
                     word_error_rate,
                     f"{word_error_rate:.2%}",
                     f"{1-word_error_rate:.2%}",
-                ]
+                ],
+                divider=idx == len(word_error_rates) - 1,
             )
 
-        print()
-        print(table)
-        print()
+        wer_mean = mean(word_error_rates.values())
+        wer_median = median(word_error_rates.values())
+
+        table.add_row(["Mean:", wer_mean, f"{wer_mean:.2%}", f"{1-wer_mean:.2%}"])
+        table.add_row(
+            ["Median:", wer_median, f"{wer_median:.2%}", f"{1-wer_median:.2%}"]
+        )
+
+        print(f"\n{table}\n")
 
     elif not expected_path.exists() or not actual_path.exists():
         raise FileNotFoundError(
