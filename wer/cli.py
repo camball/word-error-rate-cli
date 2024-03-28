@@ -1,9 +1,16 @@
 import argparse
-from jiwer import wer as _real_wer, transforms as tr
+import jiwer
+import jiwer.transforms as tr
 from pathlib import Path
 from prettytable import PrettyTable
+from typing import Mapping
 from statistics import mean, median
 import sys
+
+WER_PRECISION = 10
+"""Decimal places to display for word error rates."""
+
+PATH_METAVAR = "<path>"
 
 
 def get_args(args: list[str]):
@@ -17,14 +24,14 @@ def get_args(args: list[str]):
         "-e",
         required=True,
         help="path to a file/folder of what the text is supposed to be",
-        metavar="<path>",
+        metavar=PATH_METAVAR,
     )
     parser.add_argument(
         "--actual",
         "-a",
         required=True,
         help="path to a file/folder of what the text actually was",
-        metavar="<path>",
+        metavar=PATH_METAVAR,
     )
     parser.add_argument(
         "--enforce-file-length-check",
@@ -81,13 +88,13 @@ def custom_transform(
     )
 
 
-def wer(
+def process_words(
     expected_path: Path,
     actual_path: Path,
     enforce_file_length_check: bool,
     regex_to_ignore: str,
-) -> float:
-    return _real_wer(
+) -> jiwer.WordOutput:
+    return jiwer.process_words(
         reference=lines_from_file(expected_path),
         hypothesis=lines_from_file(actual_path),
         reference_transform=custom_transform(
@@ -99,33 +106,112 @@ def wer(
     )
 
 
+def make_table_output(comparison_data: Mapping[str, jiwer.WordOutput]) -> PrettyTable:
+    """Construct the output table from comparison data.
+
+    ### Parameters
+    - :param `Mapping[str, jiwer.WordOutput]` `comparison_data`: keys are filenames
+    of corresponding files being compared; values are the comparison data for the
+    files (e.g., WER, # insertions, # deletions, etc.)
+
+    ### Returns
+    :rtype: `PrettyTable`
+    """
+    columns = {
+        "Filename": "r",
+        "WER": "l",
+        r"% Error": "r",
+        r"% Success": "r",
+        "Dels": "r",
+        "Subs": "r",
+        "Inserts": "r",
+    }
+    table = PrettyTable(columns.keys())
+    for filename, alignment in columns.items():
+        table.align[filename] = alignment
+
+    for idx, (filename, data) in enumerate(comparison_data.items()):
+        table.add_row(
+            [
+                filename,
+                round(data.wer, WER_PRECISION),
+                f"{data.wer:.2%}",
+                f"{1-data.wer:.2%}",
+                data.deletions,
+                data.substitutions,
+                data.insertions,
+            ],
+            divider=idx == len(comparison_data) - 1,
+        )
+
+    word_error_rates = [data.wer for data in comparison_data.values()]
+    wer_mean = mean(word_error_rates)
+    wer_median = median(word_error_rates)
+
+    deletions = [data.deletions for data in comparison_data.values()]
+    substitutions = [data.substitutions for data in comparison_data.values()]
+    insertions = [data.insertions for data in comparison_data.values()]
+
+    table.add_row(
+        [
+            "Mean:",
+            round(wer_mean, WER_PRECISION),
+            f"{wer_mean:.2%}",
+            f"{1-wer_mean:.2%}",
+            round(mean(deletions), 2),
+            round(mean(substitutions), 2),
+            round(mean(insertions), 2),
+        ]
+    )
+    table.add_row(
+        [
+            "Median:",
+            round(wer_median, WER_PRECISION),
+            f"{wer_median:.2%}",
+            f"{1-wer_median:.2%}",
+            round(median(deletions), 2),
+            round(median(substitutions), 2),
+            round(median(insertions), 2),
+        ]
+    )
+
+    return table
+
+
 def main():
     args = get_args(sys.argv[1:])
 
     expected_path = Path(args.expected)
     actual_path = Path(args.actual)
 
+    if not expected_path.exists() or not actual_path.exists():
+        raise FileNotFoundError(
+            f"One or both of \n\n- {expected_path}\n- {actual_path}\n\n does not exist; "
+            "please ensure the files exist in the right location."
+        )
+
     if expected_path.is_file() and actual_path.is_file():
-        word_error_rate = wer(
+        data = process_words(
             expected_path, actual_path, args.enforce_file_length_check, args.ignore
         )
         print()
-        print(f"Word Error Rate (WER):  {word_error_rate}")
-        print(f"Percent Error:          {word_error_rate:.2%}")
-        print(f"Percent Success:        {1-word_error_rate:.2%}")
+        print(f"Word Error Rate (WER):  {data.wer:.{WER_PRECISION}f}")
+        print(f"Percent Error:          {data.wer:.2%}")
+        print(f"Percent Success:        {1-data.wer:.2%}")
         print()
 
     elif expected_path.is_dir() and actual_path.is_dir():
         expected_filenames = {filename.name for filename in expected_path.iterdir()}
         actual_filenames = {filename.name for filename in actual_path.iterdir()}
+
         if expected_filenames != actual_filenames:
             raise FileNotFoundError(
                 "The expected folder and actual folder have differing file contents. "
                 "Please ensure both folders have the same number of files with the same corresponding filenames."
             )
 
-        word_error_rates = {
-            expected_file.name: wer(
+        comparison_data = {
+            expected_file.name: process_words(
                 expected_file,
                 actual_file,
                 args.enforce_file_length_check,
@@ -136,42 +222,8 @@ def main():
             )
         }
 
-        columns = {
-            "Filename": "r",
-            "Word Error Rate (WER)": "l",
-            r"% Error": "r",
-            r"% Success": "r",
-        }
-        table = PrettyTable(columns.keys())
-        for filename, alignment in columns.items():
-            table.align[filename] = alignment
-
-        for idx, (filename, word_error_rate) in enumerate(word_error_rates.items()):
-            table.add_row(
-                [
-                    filename,
-                    word_error_rate,
-                    f"{word_error_rate:.2%}",
-                    f"{1-word_error_rate:.2%}",
-                ],
-                divider=idx == len(word_error_rates) - 1,
-            )
-
-        wer_mean = mean(word_error_rates.values())
-        wer_median = median(word_error_rates.values())
-
-        table.add_row(["Mean:", wer_mean, f"{wer_mean:.2%}", f"{1-wer_mean:.2%}"])
-        table.add_row(
-            ["Median:", wer_median, f"{wer_median:.2%}", f"{1-wer_median:.2%}"]
-        )
-
+        table = make_table_output(comparison_data)
         print(f"\n{table}\n")
-
-    elif not expected_path.exists() or not actual_path.exists():
-        raise FileNotFoundError(
-            f"One or both of \n\n- {expected_path}\n- {actual_path}\n\n does not exist; "
-            "please ensure the files exist in the right location."
-        )
 
     else:
         raise ValueError(
