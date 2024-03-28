@@ -1,6 +1,6 @@
 # Word Error Rate Calculator
 
-Calculate the word error rate (WER) from provided correct and actual text file(s).
+Calculate the word error rate (WER) from provided correct and actual text file(s), for measuring the accuracy of automated speech recognition systems.
 
 ```sh
 $ wer --expected Expected --actual Actual  # usage comparing folders of corresponding files
