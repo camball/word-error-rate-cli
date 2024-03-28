@@ -21,6 +21,10 @@ $ wer --expected expected.txt --actual actual.txt  # usage comparing single file
 Word Error Rate (WER):  0.3157894737
 Percent Error:          31.58%
 Percent Success:        68.42%
+
+Deletions:              0
+Substitutions:          6
+Insertions:             0
 ```
 
 ## Installation

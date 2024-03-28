@@ -199,6 +199,10 @@ def main():
         print(f"Percent Error:          {data.wer:.2%}")
         print(f"Percent Success:        {1-data.wer:.2%}")
         print()
+        print(f"Deletions:              {data.deletions}")
+        print(f"Substitutions:          {data.substitutions}")
+        print(f"Insertions:             {data.insertions}")
+        print()
 
     elif expected_path.is_dir() and actual_path.is_dir():
         expected_filenames = {filename.name for filename in expected_path.iterdir()}
