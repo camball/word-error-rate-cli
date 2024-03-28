@@ -12,6 +12,8 @@ WER_PRECISION = 10
 
 PATH_METAVAR = "<path>"
 
+type ComparisonData = Mapping[str, jiwer.WordOutput]
+
 
 def get_args(args: list[str]):
     parser = argparse.ArgumentParser(
@@ -44,6 +46,19 @@ def get_args(args: list[str]):
         "-i",
         help="any matches to this regex pattern will be ignored from processing",
         metavar="<regex>",
+    )
+    parser.add_argument(
+        "--visualize-output",
+        "-v",
+        help=(
+            "compute word alignment visualizations. shows sentence-by-sentence "
+            "comparisons of substitutions, deletions, insertions, and correct words. "
+            "if folders are provided to --expected/--actual, a folder should be specified. "
+            "it will be created if the folder doesn't exist. "
+            "if files are provided to --expected/--actual, a filename should be specified. "
+            "the file will be created, or overwritten if already exists. "
+        ),
+        metavar=PATH_METAVAR,
     )
 
     return parser.parse_args(args)
@@ -106,7 +121,7 @@ def process_words(
     )
 
 
-def make_table_output(comparison_data: Mapping[str, jiwer.WordOutput]) -> PrettyTable:
+def make_table(comparison_data: ComparisonData) -> PrettyTable:
     """Construct the output table from comparison data.
 
     ### Parameters
@@ -178,6 +193,12 @@ def make_table_output(comparison_data: Mapping[str, jiwer.WordOutput]) -> Pretty
     return table
 
 
+def write_word_alignments_to_files(output_dir: Path, comparison_data: ComparisonData):
+    for filename, data in comparison_data.items():
+        with open(output_dir / filename, "w") as f:
+            f.write(jiwer.visualize_alignment(data, show_measures=False))
+
+
 def main():
     args = get_args(sys.argv[1:])
 
@@ -204,6 +225,16 @@ def main():
         print(f"Insertions:             {data.insertions}")
         print()
 
+        if args.visualize_output:
+            if Path(args.visualize_output).is_dir():
+                raise ValueError(
+                    f"{args.visualize_output} is a folder that already exists. "
+                    "A filename is required."
+                )
+
+            with open(args.visualize_output, "w") as f:
+                f.write(jiwer.visualize_alignment(data, show_measures=False))
+
     elif expected_path.is_dir() and actual_path.is_dir():
         expected_filenames = {filename.name for filename in expected_path.iterdir()}
         actual_filenames = {filename.name for filename in actual_path.iterdir()}
@@ -226,7 +257,12 @@ def main():
             )
         }
 
-        table = make_table_output(comparison_data)
+        if args.visualize_output:
+            output_path = Path(args.visualize_output)
+            output_path.mkdir(mode=0o755, parents=True, exist_ok=True)
+            write_word_alignments_to_files(output_path, comparison_data)
+
+        table = make_table(comparison_data)
         print(f"\n{table}\n")
 
     else:

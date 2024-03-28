@@ -84,6 +84,49 @@ $ wer -e Expected -a Actual -i "^(?:Agent|Customer):"
 +-----------------+--------------+---------+-----------+------+------+---------+
 ```
 
+### `--visualize-output`/`-v`
+
+Compute word alignment visualizations. Shows sentence-by-sentence comparisons of substitutions, deletions, insertions, and correct words.
+
+- If folders are provided to `--expected`/`--actual`, a folder should be specified. It will be created if the folder doesn't already exist.
+- If files are provided to `--expected`/`--actual`, a filename should be specified. The file will be created, or overwritten if already exists.
+
+Output looks like the following:
+
+```sh
+wer -e expected.txt -a actual.txt -v output.txt
+```
+
+```txt
+sentence 1
+REF: hello  this is a test great  thank you *** this is another  line
+HYP: hello these is a **** great thanks you and this is another lines
+               S         D            S       I                     S
+```
+
+or when `--enforce-file-length-check` is specified:
+
+```sh
+wer -e expected.txt -a actual.txt -c -v output.txt
+```
+
+```txt
+sentence 1
+REF: hello  this is a test
+HYP: hello these is a ****
+               S         D
+
+sentence 2
+REF: great  thank you ***
+HYP: great thanks you and
+                S       I
+
+sentence 3
+REF: this is another  line
+HYP: this is another lines
+                         S
+```
+
 ### `--enforce-file-length-check`/`-c`
 
 When specified, enforces the rule that files being compared must have the same number of lines. Helpful for situations where you need to ensure your expected text file(s) have the same number of lines as your actual text file(s).
@@ -98,6 +141,7 @@ On a technical level, it removes the [`jiwer.ReduceToSingleSentence`](https://ji
 
 ## Gotchas
 
+- If `--visualize-output` is specified and `--enforce-file-length-check` is not specified, you will only get a single sentence in the output file(s), as output is reduced to a single sentence intentionally. To get separate comparison output for different sentences, ensure `--enforce-file-length-check` is specified and that your files are of the same length.
 - When folders are provided to the `--expected` and `--actual` arguments, each folder must contain exactly the same file content. For example, if the program is run as:
 
     ```sh
