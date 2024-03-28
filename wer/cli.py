@@ -1,6 +1,5 @@
 import argparse
-import jiwer
-import jiwer.transforms as tr
+from jiwer import wer as _real_wer, transforms as tr
 from pathlib import Path
 from prettytable import PrettyTable
 from statistics import mean, median
@@ -88,7 +87,7 @@ def wer(
     enforce_file_length_check: bool,
     regex_to_ignore: str,
 ) -> float:
-    return jiwer.wer(
+    return _real_wer(
         reference=lines_from_file(expected_path),
         hypothesis=lines_from_file(actual_path),
         reference_transform=custom_transform(
@@ -125,15 +124,13 @@ def main():
                 "Please ensure both folders have the same number of files with the same corresponding filenames."
             )
 
-        comparison_data = {
-            expected_file.name: {
-                "wer": wer(
-                    expected_file,
-                    actual_file,
-                    args.enforce_file_length_check,
-                    args.ignore,
-                )
-            }
+        word_error_rates = {
+            expected_file.name: wer(
+                expected_file,
+                actual_file,
+                args.enforce_file_length_check,
+                args.ignore,
+            )
             for expected_file, actual_file in zip(
                 expected_path.iterdir(), actual_path.iterdir(), strict=True
             )
@@ -149,23 +146,19 @@ def main():
         for filename, alignment in columns.items():
             table.align[filename] = alignment
 
-        for idx, (filename, data) in enumerate(comparison_data.items()):
-            try:
-                table.add_row(
-                    [
-                        filename,
-                        word_error_rate := data["wer"],
-                        f"{word_error_rate:.2%}",
-                        f"{1-word_error_rate:.2%}",
-                    ],
-                    divider=idx == len(comparison_data) - 1,
-                )
-            except KeyError:
-                pass  # silently don't add the table row if data is missing
+        for idx, (filename, word_error_rate) in enumerate(word_error_rates.items()):
+            table.add_row(
+                [
+                    filename,
+                    word_error_rate,
+                    f"{word_error_rate:.2%}",
+                    f"{1-word_error_rate:.2%}",
+                ],
+                divider=idx == len(word_error_rates) - 1,
+            )
 
-        word_error_rates = [data["wer"] for data in comparison_data.values()]
-        wer_mean = mean(word_error_rates)
-        wer_median = median(word_error_rates)
+        wer_mean = mean(word_error_rates.values())
+        wer_median = median(word_error_rates.values())
 
         table.add_row(["Mean:", wer_mean, f"{wer_mean:.2%}", f"{1-wer_mean:.2%}"])
         table.add_row(
