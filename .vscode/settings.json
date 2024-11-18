@@ -1,5 +1,5 @@
 {
-    "autoDocstring.customTemplatePath": ".vscode/sphinx_with_md.mustache",
+    "autoDocstring.docstringFormat": "one-line-sphinx",
     "autoDocstring.includeExtendedSummary": true,
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"

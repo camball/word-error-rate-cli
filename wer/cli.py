@@ -3,7 +3,7 @@ import jiwer
 import jiwer.transforms as tr
 from pathlib import Path
 from prettytable import PrettyTable
-from typing import Mapping
+from collections.abc import Mapping
 from statistics import mean, median
 import sys
 
@@ -124,13 +124,10 @@ def process_words(
 def make_table(comparison_data: ComparisonData) -> PrettyTable:
     """Construct the output table from comparison data.
 
-    ### Parameters
-    - :param `Mapping[str, jiwer.WordOutput]` `comparison_data`: keys are filenames
-    of corresponding files being compared; values are the comparison data for the
-    files (e.g., WER, # insertions, # deletions, etc.)
-
-    ### Returns
-    :rtype: `PrettyTable`
+    :param Mapping[str, jiwer.WordOutput] comparison_data: Keys are filenames
+        of corresponding files being compared; values are the comparison data
+        for the files (e.g., WER, # insertions, # deletions, etc.).
+    :return PrettyTable:
     """
     columns = {
         "Filename": "r",
