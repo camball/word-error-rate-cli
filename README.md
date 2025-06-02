@@ -49,7 +49,7 @@ wer --expected Expected --actual Actual
 
 The following demonstrates example usage of the `-i`/`--ignore` option. For example, if you are trying to calculate the WER on speech-to-text transcriptions, where each line begins with "Agent:" and "Customer:", denoting who is speaking in a conversation, that is metadata about the conversation (i.e., not the actual text we want to calculate on) and should be ignored when processing the WER.
 
-```txt
+```text
 Agent: Good evening!
 Customer: Hi, good evening.
 ```
@@ -97,7 +97,7 @@ Output looks like the following:
 wer -e expected.txt -a actual.txt -v output.txt
 ```
 
-```txt
+```text
 sentence 1
 REF: hello  this is a test great  thank you *** this is another  line
 HYP: hello these is a **** great thanks you and this is another lines
@@ -110,7 +110,7 @@ or when `--enforce-file-length-check` is specified:
 wer -e expected.txt -a actual.txt -c -v output.txt
 ```
 
-```txt
+```text
 sentence 1
 REF: hello  this is a test
 HYP: hello these is a ****
@@ -133,7 +133,7 @@ When specified, enforces the rule that files being compared must have the same n
 
 If specified and files are of different lengths, the program will raise an error like the following:
 
-```txt
+```text
 ValueError: After applying the transforms on the reference and hypothesis sentences, their lengths must match. Instead got 13 reference and 15 hypothesis sentences.
 ```
 
@@ -150,7 +150,7 @@ On a technical level, it removes the [`jiwer.ReduceToSingleSentence`](https://ji
 
     where `Expected` is a folder of transcript files that have been manually corrected by a human and `Actual` is a folder of the actual transcript files from a call transcription software, then `Expected` and `Actual` both need to have the same number of files, and the same filenames. So for example, if `Expected` contains the following files:
 
-    ```txt
+    ```text
     Expected
     ├── transcript_1.txt
     └── transcript_2.txt
@@ -158,7 +158,7 @@ On a technical level, it removes the [`jiwer.ReduceToSingleSentence`](https://ji
 
     then `Actual` needs to have the exact same filenames:
 
-    ```txt
+    ```text
     Actual
     ├── transcript_1.txt
     └── transcript_2.txt
