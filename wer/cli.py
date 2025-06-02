@@ -5,6 +5,7 @@ from pathlib import Path
 from prettytable import PrettyTable
 from collections.abc import Mapping
 from statistics import mean, median
+from typing import Literal
 import sys
 
 WER_PRECISION = 10
@@ -121,6 +122,10 @@ def process_words(
     )
 
 
+# Since `prettytable` doesn't export the type, we copy it here
+type AlignType = Literal["l", "r", "c"]
+
+
 def make_table(comparison_data: ComparisonData) -> PrettyTable:
     """Construct the output table from comparison data.
 
@@ -129,7 +134,7 @@ def make_table(comparison_data: ComparisonData) -> PrettyTable:
         for the files (e.g., WER, # insertions, # deletions, etc.).
     :return PrettyTable:
     """
-    columns = {
+    columns: dict[str, AlignType] = {
         "Filename": "r",
         "WER": "l",
         r"% Error": "r",
@@ -138,7 +143,7 @@ def make_table(comparison_data: ComparisonData) -> PrettyTable:
         "Subs": "r",
         "Inserts": "r",
     }
-    table = PrettyTable(columns.keys())
+    table = PrettyTable(list(columns))
     for filename, alignment in columns.items():
         table.align[filename] = alignment
 
@@ -148,7 +153,7 @@ def make_table(comparison_data: ComparisonData) -> PrettyTable:
                 filename,
                 round(data.wer, WER_PRECISION),
                 f"{data.wer:.2%}",
-                f"{1-data.wer:.2%}",
+                f"{1 - data.wer:.2%}",
                 data.deletions,
                 data.substitutions,
                 data.insertions,
@@ -169,7 +174,7 @@ def make_table(comparison_data: ComparisonData) -> PrettyTable:
             "Mean:",
             round(wer_mean, WER_PRECISION),
             f"{wer_mean:.2%}",
-            f"{1-wer_mean:.2%}",
+            f"{1 - wer_mean:.2%}",
             round(mean(deletions), 2),
             round(mean(substitutions), 2),
             round(mean(insertions), 2),
@@ -180,7 +185,7 @@ def make_table(comparison_data: ComparisonData) -> PrettyTable:
             "Median:",
             round(wer_median, WER_PRECISION),
             f"{wer_median:.2%}",
-            f"{1-wer_median:.2%}",
+            f"{1 - wer_median:.2%}",
             round(median(deletions), 2),
             round(median(substitutions), 2),
             round(median(insertions), 2),
@@ -215,7 +220,7 @@ def main():
         print()
         print(f"Word Error Rate (WER):  {data.wer:.{WER_PRECISION}f}")
         print(f"Percent Error:          {data.wer:.2%}")
-        print(f"Percent Success:        {1-data.wer:.2%}")
+        print(f"Percent Success:        {1 - data.wer:.2%}")
         print()
         print(f"Deletions:              {data.deletions}")
         print(f"Substitutions:          {data.substitutions}")

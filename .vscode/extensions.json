@@ -1,0 +1,10 @@
+{
+	"recommendations": [
+		"njpwerner.autodocstring", // autoDocstring - Python Docstring Generator
+		"swyddfa.esbonio", // Esbonio Sphinx Server for previewing documentation
+		"rodolphebarbanneau.python-docstring-highlighter", // Highlight RST in Docstrings
+		"tamasfe.even-better-toml", // TOML support (e.g., for `pyproject.toml`)
+		"charliermarsh.ruff", // Ruff Formatter/Linter
+	],
+	"unwantedRecommendations": []
+}

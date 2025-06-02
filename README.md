@@ -165,3 +165,9 @@ On a technical level, it removes the [`jiwer.ReduceToSingleSentence`](https://ji
     ```
 
     This is necessary so that the program knows which corresponding files to compare with when calculating WERs.
+
+## Development
+
+```sh
+uv run wer
+```
