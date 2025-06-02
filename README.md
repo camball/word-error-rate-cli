@@ -168,6 +168,14 @@ On a technical level, it removes the [`jiwer.ReduceToSingleSentence`](https://ji
 
 ## Development
 
+Run:
+
 ```sh
 uv run wer
+```
+
+Build and open documentation site:
+
+```sh
+make html && open build/html/index.html
 ```
