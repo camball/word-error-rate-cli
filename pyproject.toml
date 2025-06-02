@@ -1,26 +1,30 @@
-[tool.poetry]
+[project]
 name = "word-error-rate-cli"
 version = "0.1.0"
 description = "Calculate the word error rate (WER) from provided correct and actual text file(s)."
-authors = ["camball <67163069+camball@users.noreply.github.com>"]
+authors = [
+    { name = "camball", email = "67163069+camball@users.noreply.github.com" },
+]
 readme = "README.md"
-packages = [{ include = "wer" }]
+requires-python = ">=3.12"
+dependencies = ["jiwer >=3.0.3", "prettytable >=3.10.0"]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-jiwer = "^3.0.3"
-prettytable = "^3.10.0"
-
-[tool.poetry.group.dev.dependencies]
-sphinx = "^8.1.3"
-sphinx-autoapi = "^3.3.3"
-myst-parser = "^4.0.0"
-esbonio = "^0.16.5"
-furo = "^2024.8.6"
+[dependency-groups]
+dev = [
+    "sphinx >=8.1.3",
+    "sphinx-autoapi >=3.3.3",
+    "myst-parser >=4.0.0",
+    "esbonio >=0.16.5",
+    "furo >=2024.8.6",
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.7.9,<0.8.0"]
+build-backend = "uv_build"
 
-[tool.poetry.scripts]
+[tool.uv.build-backend]
+module-name = "wer"
+module-root = ""
+
+[project.scripts]
 wer = "wer.cli:main"
